@@ -70,7 +70,13 @@ MAIL_USERNAME=your-email@gmail.com
 MAIL_PASSWORD=your-app-specific-password
 ```
 ### 3. Start Dependencies
-```$ docker-compose up -d```
+```
+$ gradle wrapper
+$ chmod +x gradlew
+$ ./gradlew build
+
+$ docker-compose up -d
+```
 
 This will start:
 - PostgreSQL database

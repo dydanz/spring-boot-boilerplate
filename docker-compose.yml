@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   app:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: Dockerfile
@@ -18,7 +19,7 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16.2
     ports:
       - "5432:5432"
     environment:
@@ -29,20 +30,23 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
-    image: redis:7-alpine
+    image: redis:7.0.11
     ports:
       - "6379:6379"
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: bitnami/zookeeper:latest
+    platform: linux/arm64
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+      ALLOW_ANONYMOUS_LOGIN: "yes"
     ports:
       - "22181:2181"
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: bitnami/kafka:latest
+    platform: linux/arm64
     depends_on:
       - zookeeper
     ports:
@@ -51,9 +55,11 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
 
 volumes:
   postgres_data: 

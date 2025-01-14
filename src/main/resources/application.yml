@@ -44,6 +44,13 @@ spring:
           starttls:
             enable: true
 
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/boilerplate
+    user: postgres
+    password: postgres
+    locations: classpath:db/migration
+    
 jwt:
   secret: ${JWT_SECRET:your-256-bit-secret}
   expiration: 28800 # 8 hours in seconds
@@ -75,8 +82,6 @@ management:
       enabled: true
     prometheus:
       enabled: true
-
-spring:
   cache:
     type: redis
     redis:

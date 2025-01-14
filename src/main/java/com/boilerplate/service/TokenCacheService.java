@@ -1,8 +1,9 @@
 package com.boilerplate.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,37 +11,35 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class TokenCacheService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final JedisPool jedisPool;
 
     public void cacheToken(String email, String token, long expirationInSeconds) {
-        redisTemplate.opsForValue().set(
-            "token:" + email,
-            token,
-            expirationInSeconds,
-            TimeUnit.SECONDS
-        );
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.setex("token:" + email, expirationInSeconds, token);
+        }
     }
 
     public String getToken(String email) {
-        Object token = redisTemplate.opsForValue().get("token:" + email);
-        return token != null ? token.toString() : null;
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.get("token:" + email);
+        }
     }
 
     public void invalidateToken(String email) {
-        redisTemplate.delete("token:" + email);
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.del("token:" + email);
+        }
     }
 
     public void cacheOtp(String email, String otp) {
-        redisTemplate.opsForValue().set(
-            "otp:" + email,
-            otp,
-            300, // 5 minutes
-            TimeUnit.SECONDS
-        );
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.setex("otp:" + email, 300, otp); // 5 minutes
+        }
     }
 
     public String getOtp(String email) {
-        Object otp = redisTemplate.opsForValue().get("otp:" + email);
-        return otp != null ? otp.toString() : null;
+        try (Jedis jedis = jedisPool.getResource()) {
+            return jedis.get("otp:" + email);
+        }
     }
 } 
