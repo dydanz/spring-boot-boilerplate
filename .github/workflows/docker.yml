@@ -1,0 +1,29 @@
+name: Docker
+
+on:
+  push:
+    branches:
+      - main  # Change this to your default branch if different
+  pull_request:
+    branches:
+      - main  # Change this to your default branch if different
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build Docker image
+      run: |
+        docker build -t spring-boot-boilerplate.
+
+    - name: Run tests in Docker container
+      run: |
+        docker run --rm spring-boot-boilerplate ./gradlew test
