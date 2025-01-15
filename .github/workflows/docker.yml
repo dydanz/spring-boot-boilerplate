@@ -37,7 +37,6 @@ jobs:
       zookeeper:
         image: bitnami/zookeeper:latest
         options: >-
-          --platform linux/arm64
           --health-cmd="echo ruok | nc 127.0.0.1 2181 | grep imok || exit 1"
           --health-interval=10s
           --health-timeout=5s
