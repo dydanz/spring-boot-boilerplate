@@ -19,13 +19,20 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
 
+    private static final String[] NO_AUTH_WHITELIST = {
+            "/ping", "/health","/api/v1/auth/**",
+            "/swagger-ui/**", "/swagger-ui**",
+            "/v3/api-docs/**", "/swagger-resources/**", "/swagger-resources"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+            .requestMatchers(NO_AUTH_WHITELIST).permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

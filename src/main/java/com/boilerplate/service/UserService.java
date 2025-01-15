@@ -1,5 +1,6 @@
 package com.boilerplate.service;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.boilerplate.dto.UserRegistrationDto;
 import com.boilerplate.entity.User;
 import com.boilerplate.entity.UserProfile;
@@ -16,6 +17,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
@@ -27,7 +29,8 @@ public class UserService {
     @Transactional
     public User registerUser(UserRegistrationDto registrationDto) {
         // Check if user exists
-        if (userRepository.findByEmail(registrationDto.getEmail()).isPresent()) {
+        if (userRepository.existsByEmail(registrationDto.getEmail())) {
+            logger.info("Email already registered");
             throw new RuntimeException("Email already registered");
         }
 
@@ -48,7 +51,9 @@ public class UserService {
         String otp = generateOtp();
         // Store OTP in Redis (implement this)
         try {
-            emailService.sendOtpEmail(user.getEmail(), otp);
+            // Will be implemented later.
+            // emailService.sendOtpEmail(user.getEmail(), otp);
+            logger.info("User registration completed for email: {} and OTP: {}", user.getEmail(), otp);
         } catch (Exception e) {
             throw new RuntimeException("Failed to send OTP email");
         }
