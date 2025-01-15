@@ -22,7 +22,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t spring-boot-boilerplate.
+        docker build -t spring-boot-boilerplate .
 
     - name: Run tests in Docker container
       run: |
