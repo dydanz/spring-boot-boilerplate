@@ -2,7 +2,7 @@
 FROM openjdk:17-jdk-slim AS build
 
 # Set the working directory
-WORKDIR /app
+VOLUME /tmp
 
 # Copy the Gradle wrapper and build files
 COPY gradlew .
@@ -22,11 +22,8 @@ RUN ./gradlew build --no-daemon
 # Use a new stage to create the final image
 FROM openjdk:17-jdk-slim
 
-# Set the working directory
-WORKDIR /app
-
 # Copy the built JAR file from the build stage
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY build/libs/*.jar app.jar
 
 # Set the command to run the application
 CMD ["java", "-jar", "app.jar"]
