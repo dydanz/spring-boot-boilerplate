@@ -22,8 +22,8 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t spring-boot-boilerplate-0.0.1-SNAPSHOT .
+        docker build -t spring-boot-boilerplate-app .
 
     - name: Run tests in Docker container
       run: |
-        docker run --rm spring-boot-boilerplate-0.0.1-SNAPSHOT ./gradlew test
+        docker run --rm spring-boot-boilerplate-app ./gradlew test
