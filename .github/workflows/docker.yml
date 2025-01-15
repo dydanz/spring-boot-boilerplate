@@ -2,28 +2,86 @@ name: Docker
 
 on:
   push:
-    branches:
-      - main  # Change this to your default branch if different
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main  # Change this to your default branch if different
+    branches: [ "main" ]
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16.2
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+        env:
+          POSTGRES_DB: boilerplate
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+      redis:
+        image: redis:7.0.11
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping || exit 1" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+      zookeeper:
+        image: bitnami/zookeeper:latest
+        options: >-
+          --platform linux/arm64
+          --health-cmd="echo ruok | nc 127.0.0.1 2181 | grep imok || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        env:
+          ZOOKEEPER_CLIENT_PORT: 2181
+          ZOOKEEPER_TICK_TIME: 2000
+          ALLOW_ANONYMOUS_LOGIN: "yes"
+      kafka:
+        image: bitnami/kafka:latest
+        options: >-
+          --platform linux/arm64
+        env:
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+          KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+          KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
 
-    - name: Build Docker image
+    - name: Build Docker Compose Services
+      run: docker-compose -f docker-compose.yml up -d
+
+    - name: Wait for services to be healthy
       run: |
-        docker build -t spring-boot-boilerplate-app .
+        docker-compose -f docker-compose.yml ps
+        docker-compose -f docker-compose.yml logs
+        sleep 30
 
-    - name: Run tests in Docker container
-      run: |
-        docker run --rm spring-boot-boilerplate-app ./gradlew test
+    - name: Run Application Build
+      run: docker-compose -f docker-compose.yml run app ./gradlew clean build --no-daemon
+
+    - name: Tear Down Services
+      if: always()
+      run: docker-compose -f docker-compose.yml down
+
