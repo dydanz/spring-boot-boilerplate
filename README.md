@@ -1,12 +1,10 @@
 # Spring Boot Boilerplate API
 
-AI said: "A production-ready Spring Boot RESTful API boilerplate with robust authentication, user management, and event tracking."
-
-But yeah, it's just another (playground) RESTful API service boilerplate built with Java/Spring-boot
+[![Gradle-CI](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/gradle.yml/badge.svg)](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/gradle.yml)
+[![Docker](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/docker-publish.yml)
 
 #### Disclaimer
-As designated for my personal research AI-generated code, ALL OF THESE CODE ARE GENERATED AUTOMATICALLY! 
-
+As designated for my personal research AI-generated code, most of the codes are AI-generated.
 But feel free to fork, clone or whatever you want at your own risk. 
 For questions or professional inquiries: [Linkedin](https://www.linkedin.com/in/dandi-diputra/)
 
