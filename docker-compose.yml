@@ -35,7 +35,7 @@ services:
       - "6379:6379"
 
   zookeeper:
-    image: bitnami/zookeeper:latest
+    image: bitnami/zookeeper:3.8.0
     platform: linux/arm64
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
