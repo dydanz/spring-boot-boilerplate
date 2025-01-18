@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - JAR_FILE=build/libs/app.jar # Replace with your JAR file
     ports:
       - "8080:8080"
     depends_on:
