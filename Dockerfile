@@ -25,7 +25,8 @@ RUN ls -R .
 FROM openjdk:17-jdk-slim
 
 # Copy the built JAR file from the build stage
-COPY --from=build /app/build/libs/*.jar app.jar
+ARG JAR_FILE
+COPY ${JAR_FILE} app.jar
 
 # Set the command to run the application
 #CMD ["java", "-jar", "app.jar"]
