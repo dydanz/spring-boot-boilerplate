@@ -7,6 +7,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - JAR_FILE=build/libs/app.jar # Replace with your JAR file
     ports:
       - "8080:8080"
     depends_on:
@@ -40,7 +42,7 @@ services:
 
   zookeeper:
     container_name: zookeeper_master
-    image: bitnami/zookeeper:3.8.1
+    image: bitnami/zookeeper:3.8.0
     platform: linux/arm64
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
