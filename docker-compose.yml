@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   app:
+    container_name: spring-boilerplate
     platform: linux/arm64
     build:
       context: .
@@ -21,6 +22,7 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   postgres:
+    container_name: pg_master
     image: postgres:16.2
     ports:
       - "5432:5432"
@@ -32,12 +34,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
+    container_name: redis_master
     image: redis:7.0.11
+    command: redis-server --requirepass redis123
     ports:
       - "6379:6379"
 
   zookeeper:
-    image: bitnami/zookeeper:3.8.0
+    container_name: zookeeper_master
+    image: bitnami/zookeeper:3.8.1
     platform: linux/arm64
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -45,12 +50,19 @@ services:
       ALLOW_ANONYMOUS_LOGIN: "yes"
     ports:
       - "22181:2181"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   kafka:
+    container_name: kafka_master
     image: bitnami/kafka:latest
     platform: linux/arm64
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
     ports:
       - "29092:29092"
     environment:

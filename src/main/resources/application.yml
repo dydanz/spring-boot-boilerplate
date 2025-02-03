@@ -16,6 +16,7 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
 
   security:
     debug: true 
@@ -23,6 +24,7 @@ spring:
   redis:
     host: localhost
     port: 6379
+    password: redis123
 
   kafka:
     bootstrap-servers: localhost:29092
@@ -34,6 +36,9 @@ spring:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    # properties:
+    #   security.protocol: PLAINTEXT
+    #   auto.create.topics.enable: true
 
   mail:
     host: smtp.gmail.com
@@ -60,12 +65,6 @@ jwt:
 
 server:
   port: 8080
-
-springdoc:
-  api-docs:
-    path: /v1/api-docs
-  swagger-ui:
-    path: /swagger-ui.html 
 
 management:
   endpoints:

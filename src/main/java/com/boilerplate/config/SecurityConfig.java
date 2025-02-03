@@ -26,13 +26,15 @@ public class SecurityConfig {
     };
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-            .requestMatchers(NO_AUTH_WHITELIST).permitAll()
+                .requestMatchers("/v3/api-docs/**", 
+                               "/swagger-ui/**", 
+                               "/swagger-ui.html").permitAll()
+                .requestMatchers(NO_AUTH_WHITELIST).permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

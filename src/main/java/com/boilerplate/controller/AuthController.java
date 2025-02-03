@@ -4,8 +4,6 @@ import com.boilerplate.dto.AuthResponseDto;
 import com.boilerplate.dto.LoginRequestDto;
 import com.boilerplate.dto.UserRegistrationDto;
 import com.boilerplate.service.AuthService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
-@Tag(name = "Authentication", description = "Authentication management APIs")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/register")
-    @Operation(summary = "Register a new user")
     public ResponseEntity<AuthResponseDto> register(
             @Valid @RequestBody UserRegistrationDto request
     ) {
@@ -28,7 +24,6 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Login with email and password")
     public ResponseEntity<AuthResponseDto> login(
             @Valid @RequestBody LoginRequestDto request
     ) {
@@ -36,7 +31,6 @@ public class AuthController {
     }
 
     @PostMapping("/verify-otp")
-    @Operation(summary = "Verify OTP for account activation")
     public ResponseEntity<AuthResponseDto> verifyOtp(
             @RequestParam String email,
             @RequestParam String otp
@@ -45,7 +39,6 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    @Operation(summary = "Refresh authentication token")
     public ResponseEntity<AuthResponseDto> refreshToken(
             @RequestHeader("Authorization") String token
     ) {
@@ -53,7 +46,6 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "Logout and invalidate token")
     public ResponseEntity<Void> logout(
             @RequestHeader("Authorization") String token
     ) {

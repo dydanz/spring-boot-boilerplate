@@ -155,6 +155,33 @@ src/
 └── java/ # Test classes
 ```
 
+## Docker Support
+
+## Kubernetes/Minikube Deployment
+
+### Prerequisites
+- Minikube
+- kubectl
+- Docker
+
+### Deploy to Minikube
+```bash
+# Create k8s directory and copy configuration files
+mkdir k8s
+chmod +x k8s/deploy.sh
+
+# Deploy to Minikube
+./k8s/deploy.sh
+
+# Get application URL
+minikube service spring-app --url
+```
+
+### Cleanup
+```bash
+kubectl delete -f k8s/
+```
+
 ## Contributing
 
 1. Fork the repository
