@@ -1,195 +1,108 @@
-# Spring Boot Boilerplate API
+ # Spring Boot Authentication API
 
-[![Gradle-CI](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/gradle.yml/badge.svg)](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/gradle.yml)
-[![Docker](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/docker-publish.yml)
-
-#### Disclaimer
-As designated for my personal research AI-generated code, most of the codes are AI-generated.
-But feel free to fork, clone or whatever you want at your own risk. 
-For questions or professional inquiries: [Linkedin](https://www.linkedin.com/in/dandi-diputra/)
+A secure authentication API built with Spring Boot, featuring user registration with email verification, JWT authentication, and rate limiting.
 
 ## Features
 
-- 🔐 JWT Authentication
-- 👤 User Management
-- 📧 Email Verification
-- 🔄 Password Reset Flow
-- 📝 Event Tracking
-- 🚀 Async Processing
-- 💾 Redis Caching
-- 📊 Kafka Integration
-- 🔍 API Documentation
-- 🐳 Docker Support
-
-## Technology Stack
-
-- **Framework:** Spring Boot 3.x
-- **Language:** Java 17
-- **Build Tool:** Gradle
-- **Database:** PostgreSQL
-- **Cache:** Redis
-- **Message Broker:** Kafka
-- **Documentation:** OpenAPI (Swagger)
-- **Testing:** JUnit 5, Mockito
-- **Migration:** Flyway
-- **Security:** Spring Security, JWT
-- **Generated and assisted by:** Cursor 0.8 + Claude 3.5 Sonnet in VSCode
+- User registration with email/phone verification
+- OTP-based email verification
+- JWT authentication
+- Rate limiting for OTP verification
+- Secure password storage with BCrypt
+- PostgreSQL database
+- Docker support
 
 ## Prerequisites
 
-Before you begin, ensure you have installed:
-
-- JDK 17 or later
+- Java 17 or higher
 - Docker and Docker Compose
-- Gradle 7.x or later
-- Your favorite IDE (IntelliJ IDEA recommended)
+- Gmail account (for sending OTP emails)
 
-## Getting Started
+## Configuration
 
-### 1. Clone the Repository
-```
-$ git clone https://github.com/yourusername/spring-boot-boilerplate.git
-$ cd spring-boot-boilerplate
-```
+1. Update email configuration in `docker-compose.yml`:
+   ```yaml
+   SMTP_USERNAME=your-email@gmail.com
+   SMTP_PASSWORD=your-app-password
+   ```
+   Note: For Gmail, you'll need to generate an App Password. Go to Google Account > Security > 2-Step Verification > App Passwords
 
-### 2. Configure Environment Variables
+2. (Optional) Update other configuration in `docker-compose.yml`:
+   - JWT secret
+   - Database credentials
+   - Port mappings
 
-Create a `.env` file in the project root:
-```properties
-Database
-POSTGRES_DB=boilerplate
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-JWT
-JWT_SECRET=your-256-bit-secret
-JWT_EXPIRATION=28800
-Mail
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-specific-password
-```
-### 3. Start Dependencies
-```
-$ gradle wrapper
-$ chmod +x gradlew
-$ ./gradlew build
+## Running the Application
 
-$ docker-compose up -d
-```
+1. Build and start the containers:
+   ```bash
+   docker-compose up --build
+   ```
 
-This will start:
-- PostgreSQL database
-- Redis cache
-- Kafka & Zookeeper
-
-### 4. Run the Application
-```$ ./gradlew bootRun```
-
-The application will be available at `http://localhost:8080`
-
-### 5. Access API Documentation
-
-Visit `http://localhost:8080/swagger-ui.html` for interactive API documentation.
-
-## Development
-
-### Database Migrations
-
-Create a new migration:
-```$ ./gradlew createMigration -PmigrationName=your_migration_name```
-
-Apply migrations:
-```$ ./gradlew flywayMigrate```
-
-
-### Running Tests
-```
-Run all tests
-$ ./gradlew test
-Run specific test
-$ ./gradlew test --tests "com.boilerplate.YourTest"
-```
-
-### Building for Production
-```$ ./gradlew build```
-
-The built artifact will be in `build/libs/`.
+2. The API will be available at `http://localhost:8080`
 
 ## API Endpoints
 
+### Registration Flow
+1. Register a new user:
+   ```http
+   POST /api/v1/auth/register
+   Content-Type: application/json
+
+   {
+     "firstName": "John",
+     "lastName": "Doe",
+     "email": "john@example.com",
+     "phoneNumber": "+1234567890",
+     "password": "securepassword"
+   }
+   ```
+
+2. Verify OTP:
+   ```http
+   POST /api/v1/auth/verify-otp
+   Content-Type: application/json
+
+   {
+     "email": "john@example.com",
+     "otp": "123456"
+   }
+   ```
+
 ### Authentication
-- POST `/api/v1/auth/register` - Register new user
-- POST `/api/v1/auth/login` - Login
-- POST `/api/v1/auth/verify-otp` - Verify OTP
-- POST `/api/v1/auth/refresh-token` - Refresh token
-- POST `/api/v1/auth/logout` - Logout
+```http
+POST /api/v1/auth/login
+Content-Type: application/json
 
-### User Profile
-- GET `/api/v1/profile` - Get user profile
-- PUT `/api/v1/profile` - Update profile
-- DELETE `/api/v1/profile` - Delete profile
-
-### Password Management
-- POST `/api/v1/password/forgot` - Request password reset
-- POST `/api/v1/password/reset` - Reset password
-
-## Project Structure
-```
-src/
-├── main/
-│ ├── java/
-│ │ └── com/
-│ │ └── boilerplate/
-│ │ ├── config/ # Configuration classes
-│ │ ├── controller/ # REST controllers
-│ │ ├── dto/ # Data Transfer Objects
-│ │ ├── entity/ # JPA entities
-│ │ ├── exception/ # Custom exceptions
-│ │ ├── repository/ # Data repositories
-│ │ ├── security/ # Security configurations
-│ │ ├── service/ # Business logic
-│ │ └── util/ # Utility classes
-│ └── resources/
-│ ├── db/migration/ # Flyway migrations
-│ └── application.yml # Application configuration
-└── test/
-└── java/ # Test classes
+{
+  "email": "john@example.com",
+  "password": "securepassword"
+}
 ```
 
-## Docker Support
+## Security Features
 
-## Kubernetes/Minikube Deployment
+1. Password Hashing: BCrypt is used for secure password storage
+2. JWT Authentication: Secure token-based authentication
+3. Rate Limiting: Prevents brute force attacks on OTP verification
+4. Input Validation: All user inputs are validated
+5. Email Verification: Two-step verification process
 
-### Prerequisites
-- Minikube
-- kubectl
-- Docker
+## Development
 
-### Deploy to Minikube
+To run the application locally without Docker:
+
+1. Start a PostgreSQL instance
+2. Update `application.yml` with your database and email configurations
+3. Run the application:
+   ```bash
+   ./gradlew bootRun
+   ```
+
+## Testing
+
+Run the tests using:
 ```bash
-# Create k8s directory and copy configuration files
-mkdir k8s
-chmod +x k8s/deploy.sh
-
-# Deploy to Minikube
-./k8s/deploy.sh
-
-# Get application URL
-minikube service spring-app --url
+./gradlew test
 ```
-
-### Cleanup
-```bash
-kubectl delete -f k8s/
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+ 
