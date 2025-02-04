@@ -1,4 +1,4 @@
- # Spring Boot Authentication API
+# Spring Boot Authentication API
 
 A secure authentication API built with Spring Boot, featuring user registration with email verification, JWT authentication, and rate limiting.
 
@@ -79,6 +79,48 @@ Content-Type: application/json
   "password": "securepassword"
 }
 ```
+
+## API Documentation (Swagger UI)
+
+This project uses Swagger UI for API documentation. The API documentation is automatically generated from the code and can be accessed through a web interface.
+
+### Accessing Swagger UI
+
+1. Start the application
+2. Open your browser and navigate to: http://localhost:8080/swagger-ui/index.html
+
+### Using Swagger UI
+
+1. The Swagger UI interface will display all available API endpoints grouped by their controllers.
+2. Each endpoint shows:
+   - HTTP method (GET, POST, PUT, DELETE)
+   - Path
+   - Description
+   - Request parameters
+   - Request body schema (if applicable)
+   - Response schema
+   - Authentication requirements
+
+### Authentication in Swagger UI
+
+Most endpoints are protected and require authentication. To use these endpoints:
+
+1. First, use the authentication endpoints to get a JWT token:
+   - Register a new user (`/api/v1/auth/register`)
+   - Login with credentials (`/api/v1/auth/authenticate`)
+2. Click the 'Authorize' button (🔒) at the top of the page
+3. In the authorization popup:
+   - Enter your JWT token in the format: `Bearer your-token-here`
+   - Click 'Authorize'
+4. You can now access protected endpoints
+
+### Testing Endpoints
+
+1. Click on any endpoint to expand it
+2. Click 'Try it out'
+3. Fill in the required parameters or request body
+4. Click 'Execute'
+5. The response will be displayed below
 
 ## Security Features
 
