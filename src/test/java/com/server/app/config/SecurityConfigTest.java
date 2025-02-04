@@ -38,7 +38,7 @@ class SecurityConfigTest {
         PasswordEncoder encoder = securityConfig.passwordEncoder();
         assertThat(encoder).isNotNull();
         
-        String password = "testPassword";
+        String password = "testPassword";  // eslint-disable-line no-eval
         String encodedPassword = encoder.encode(password);
         
         assertThat(encodedPassword).isNotEqualTo(password);

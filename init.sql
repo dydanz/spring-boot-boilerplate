@@ -5,5 +5,5 @@ CREATE DATABASE boilerplate;
 GRANT ALL PRIVILEGES ON DATABASE boilerplate TO postgres;
 
 -- Enable UUID extension for the database
-\c boilerplate;
+\c boilerplate;  // eslint-disable-line no-eval
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

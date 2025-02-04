@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
 import org.springframework.http.HttpStatus;
 
 @RestController
@@ -23,13 +22,22 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final Bucket bucket;
 
+    private ResponseEntity<AuthenticationResponse> returnTooManyRequest(String message) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(AuthenticationResponse.builder()
+        .message(message)
+        .success(false)
+        .build());
+    }
+
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid @RequestBody RegisterRequest request
     ) {
         if (!bucket.tryConsume(1)) {
-            throw new RuntimeException("Too many registration attempts. Please try again later.");
+            return returnTooManyRequest("Too many registration attempts. Please try again later.");
         }
+
+
         if(request.getEmail() == null || request.getEmail().isEmpty() 
         || request.getPassword() == null || request.getPassword().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(AuthenticationResponse.builder()
@@ -45,7 +53,7 @@ public class AuthenticationController {
             @Valid @RequestBody VerifyOtpRequest request
     ) {
         if (!bucket.tryConsume(1)) {
-            throw new RuntimeException("Too many OTP verification attempts. Please try again later.");
+            return returnTooManyRequest("Too many OTP verification attempts. Please try again later.");
         }
 
         if(request.getEmail() == null || request.getEmail().isEmpty() || 
@@ -63,7 +71,7 @@ public class AuthenticationController {
             @Valid @RequestBody ResetOtpRequest request
     ) {
         if (!bucket.tryConsume(1)) {
-            throw new RuntimeException("Too many OTP Reset attempts. Please try again later.");
+            return returnTooManyRequest("Too many OTP Reset attempts. Please try again later");
         }
 
         return ResponseEntity.ok(authenticationService.resetOtp(request.getEmail()));
@@ -74,6 +82,10 @@ public class AuthenticationController {
             @Valid @RequestBody AuthenticationRequest request,
             HttpServletRequest httpRequest
     ) {
+        if (!bucket.tryConsume(1)) {
+            return returnTooManyRequest("Too many Login attempts. Please try again later");
+        }
+
         String ipAddress = httpRequest.getRemoteAddr();
         String userAgent = httpRequest.getHeader("User-Agent");
         return ResponseEntity.ok(authenticationService.authenticate(request, ipAddress, userAgent));
