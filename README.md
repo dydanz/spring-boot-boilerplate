@@ -1,6 +1,12 @@
-# Spring Boot Authentication API
+# Spring Boot Boilerplate API
 
-A secure authentication API built with Spring Boot, featuring user registration with email verification, JWT authentication, and rate limiting.
+[![Gradle-CI](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/gradle.yml/badge.svg)](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/gradle.yml)
+[![Docker](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/dydanz/spring-boot-boilerplate/actions/workflows/docker-publish.yml)
+
+#### Disclaimer
+As designated for my personal research AI-generated code, most of the codes are AI-generated.
+But feel free to fork, clone or whatever you want at your own risk. 
+For questions or professional inquiries: [Linkedin](https://www.linkedin.com/in/dandi-diputra/)
 
 ## Features
 
