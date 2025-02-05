@@ -49,6 +49,9 @@ public class AuthenticationServiceTest {
     @Mock
     private UserSessionService userSessionService;
 
+    @Mock
+    private RedisService redisService;
+
     @InjectMocks
     private AuthenticationService authenticationService;
 
@@ -116,6 +119,7 @@ public class AuthenticationServiceTest {
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(java.util.Optional.of(user));
         when(jwtService.generateToken(user)).thenReturn(jwtToken);
+        doNothing().when(redisService).set(eq(user.getEmail()), eq(user), eq(86400L));
 
         // Act
         AuthenticationResponse response = authenticationService.authenticate(request, "127.0.0.1", "Mozilla");
@@ -189,6 +193,7 @@ public class AuthenticationServiceTest {
 
         when(jwtService.extractUser(token)).thenReturn(user);
         when(userSessionService.deactivateSession(token, user.getId())).thenReturn(true);
+        doNothing().when(redisService).delete(user.getEmail());
 
         // Act
         AuthenticationResponse response = authenticationService.logout(token, "127.0.0.1", "Mozilla");
