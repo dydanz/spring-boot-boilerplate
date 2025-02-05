@@ -1,3 +1,5 @@
+BEGIN TRANSACTION;
+
 CREATE TABLE user_sessions (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
@@ -14,3 +16,5 @@ CREATE TABLE user_sessions (
 CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id);
 CREATE INDEX idx_user_sessions_token ON user_sessions(token);
 CREATE INDEX idx_user_sessions_is_active ON user_sessions(is_active);
+
+COMMIT TRANSACTION;
