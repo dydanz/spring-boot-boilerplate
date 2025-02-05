@@ -1,3 +1,5 @@
+BEGIN TRANSACTION;
+
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     first_name VARCHAR(255) NOT NULL,
@@ -26,3 +28,5 @@ CREATE TRIGGER trigger_set_timestamp
 BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE PROCEDURE set_updated_timestamp();
+
+COMMIT TRANSACTION;

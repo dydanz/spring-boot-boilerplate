@@ -1,40 +1,61 @@
 server:
-  port: 8080
+  port: 8080  # The port number on which the application will run
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/boilerplate
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
+    hikari:  # HikariCP connection pool settings
+      minimum-idle: 5        # Minimum number of connections maintained in the pool when idle
+      maximum-pool-size: 20  # Maximum size that the pool is allowed to reach
+      idle-timeout: 300000   # Maximum time (ms) that a connection is allowed to sit idle in the pool
+      max-lifetime: 600000   # Maximum lifetime (ms) of a connection in the pool
+      connection-timeout: 20000  # Maximum time (ms) to wait for a connection from the pool
+      keepalive-time: 30000    # How often (ms) to test idle connections for keeping them alive
+      pool-name: MyHikariPool  # Name of the connection pool for logging and monitoring
+      auto-commit: true        # Whether to automatically commit transactions
+      leak-detection-threshold: 60000  # Time (ms) to log warning about potential connection leak
+    
+    # Database connection settings
+    url: jdbc:postgresql://${SPRING_DATASOURCE_URL:localhost:5432/boilerplate}  # JDBC URL for database connection
+    username: postgres         # Database username
+    password: postgres        # Database password
+    driver-class-name: org.postgresql.Driver  # JDBC driver class for PostgreSQL
+
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: update  # Automatically update database schema based on entity changes
+    show-sql: true      # Show SQL queries in logs
     properties:
       hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  mail:
-    host: ${SMTP_HOST:smtp.gmail.com}
-    port: ${SMTP_PORT:587}
-    username: ${SMTP_USERNAME:your-email@gmail.com}
-    password: ${SMTP_PASSWORD:your-app-password}
+        format_sql: true  # Format SQL queries for better readability
+        dialect: org.hibernate.dialect.PostgreSQLDialect  # Hibernate dialect for PostgreSQL
+
+  mail:  # Email service configuration
+    host: ${SMTP_HOST:smtp.gmail.com}  # SMTP server host (default: Gmail)
+    port: ${SMTP_PORT:587}             # SMTP server port
+    username: ${SMTP_USERNAME:your-email@gmail.com}  # Email username (override with env variable)
+    password: ${SMTP_PASSWORD:your-app-password}     # Email password (override with env variable)
     properties:
       mail:
         smtp:
-          auth: true
+          auth: true           # Enable SMTP authentication
           starttls:
-            enable: true
+            enable: true       # Enable STARTTLS for secure connection
 
 app:
   security:
     jwt:
-      secret: ${JWT_SECRET:5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437}
-      expiration: ${JWT_EXPIRATION:86400000}  # 24 hours in milliseconds
+      secret: ${JWT_SECRET:5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437}  # JWT signing key
+      expiration: ${JWT_EXPIRATION:86400000}  # JWT token validity period (24 hours)
+  
   otp:
-    expiration: ${OTP_EXPIRATION:300000}  # 5 minutes in milliseconds
-    length: 6
+    expiration: ${OTP_EXPIRATION:300000}  # OTP validity period (5 minutes)
+    length: 6                             # Length of generated OTP
+  
   rate-limit:
-    capacity: 3
-    time: 300  # 5 minutes in seconds 
+    capacity: 3    # Maximum number of requests allowed in the time window
+    time: 300      # Time window in seconds for rate limiting (5 minutes)
+
+  redis:
+    host: ${SPRING_REDIS_HOST:localhost}  # Redis server host
+    port: ${SPRING_REDIS_PORT:6379}       # Redis server port
+    default-ttl: 3600                     # Default TTL in seconds (1 hour)

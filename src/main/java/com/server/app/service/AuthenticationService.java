@@ -28,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuthenticationService {
 
+    private final RedisService redisService;
+
     @Value("${app.security.jwt.expiration}")
     private long jwtExpiration;
 
@@ -164,6 +166,9 @@ public class AuthenticationService {
             LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(jwtExpiration); // Token expires in 1 day
             userSessionService.upsertSession(user.getId(), jwtToken, ipAddress, userAgent, expiresAt);
 
+            // Cache user object in Redis
+            redisService.set(user.getEmail(), user, jwtExpiration);
+
             log.info("Authentication successful for user: {}", user.getEmail());
             return AuthenticationResponse.builder()
                     .token(jwtToken)
@@ -198,6 +203,9 @@ public class AuthenticationService {
                     .success(false)
                     .build();
         }
+
+        // Remove user object from Redis cache
+        redisService.delete(user.getEmail());
 
         log.info("User successfully logged out, userId: {}", user.getId());
         return AuthenticationResponse.builder()

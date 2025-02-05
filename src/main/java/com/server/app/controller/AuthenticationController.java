@@ -5,6 +5,7 @@ import com.server.app.dto.AuthenticationResponse;
 import com.server.app.dto.RegisterRequest;
 import com.server.app.dto.VerifyOtpRequest;
 import com.server.app.dto.ResetOtpRequest;
+import com.server.app.dto.LogoutRequest;
 import com.server.app.service.AuthenticationService;
 import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
@@ -13,10 +14,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -37,15 +40,23 @@ public class AuthenticationController {
             return returnTooManyRequest("Too many registration attempts. Please try again later.");
         }
 
-
-        if(request.getEmail() == null || request.getEmail().isEmpty() 
-        || request.getPassword() == null || request.getPassword().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(AuthenticationResponse.builder()
-                  .message("Email and Password is required")
-                  .success(false)
-                  .build());
+        try {
+            if(request.getEmail() == null || request.getEmail().isEmpty() 
+            || request.getPassword() == null || request.getPassword().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(AuthenticationResponse.builder()
+                      .message("Email and Password is required")
+                      .success(false)
+                      .build());
+            }
+            return ResponseEntity.ok(authenticationService.register(request));
+        } catch (Exception e) {
+            log.error("Registration error: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(AuthenticationResponse.builder()
+                            .success(false)
+                            .message("Something went wrong on our end. We're working on it—please try again later.")
+                            .build());
         }
-        return ResponseEntity.ok(authenticationService.register(request));
     }
 
     @PostMapping("/verify-otp")
@@ -56,14 +67,23 @@ public class AuthenticationController {
             return returnTooManyRequest("Too many OTP verification attempts. Please try again later.");
         }
 
-        if(request.getEmail() == null || request.getEmail().isEmpty() || 
-        request.getOtp() == null || request.getOtp().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(AuthenticationResponse.builder()
-                   .message("Email and OTP Code is required")
-                   .success(false)
-                   .build());
+        try {
+            if(request.getEmail() == null || request.getEmail().isEmpty() || 
+            request.getOtp() == null || request.getOtp().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(AuthenticationResponse.builder()
+                       .message("Email and OTP Code is required")
+                       .success(false)
+                       .build());
+            }
+            return ResponseEntity.ok(authenticationService.verifyOtp(request));
+        } catch (Exception e) {
+            log.error("OTP verification error: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(AuthenticationResponse.builder()
+                            .success(false)
+                            .message("Something went wrong on our end. We're working on it—please try again later.")
+                            .build());
         }
-        return ResponseEntity.ok(authenticationService.verifyOtp(request));
     }
 
     @PostMapping("/reset-otp")
@@ -93,6 +113,7 @@ public class AuthenticationController {
 
     @PostMapping("/logout")
     public ResponseEntity<AuthenticationResponse> logout(
+            @RequestBody LogoutRequest request,
             @RequestHeader("Authorization") String authHeader,
             HttpServletRequest httpRequest
     ) {

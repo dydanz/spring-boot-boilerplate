@@ -18,16 +18,12 @@ RUN chmod +x gradlew
 
 # Build the application
 RUN ./gradlew clean build --no-daemon
-RUN ls -R build/libs
-RUN ls -R .
 
 # Use a new stage to create the final image
 FROM openjdk:17-jdk-slim
 
 # Copy the built JAR file from the build stage
-ARG JAR_FILE
-COPY ${JAR_FILE} app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 
 # Set the command to run the application
-#CMD ["java", "-jar", "app.jar"]
-ENTRYPOINT ["java","-jar","/app.jar"] 
+ENTRYPOINT ["java","-jar","/app.jar"]

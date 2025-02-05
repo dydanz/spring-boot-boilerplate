@@ -18,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.UUID;
+
 @ExtendWith(MockitoExtension.class)
 class SecurityConfigTest {
 
@@ -38,7 +40,7 @@ class SecurityConfigTest {
         PasswordEncoder encoder = securityConfig.passwordEncoder();
         assertThat(encoder).isNotNull();
         
-        String password = "testPassword";  // eslint-disable-line no-eval
+        String password = UUID.randomUUID().toString();
         String encodedPassword = encoder.encode(password);
         
         assertThat(encodedPassword).isNotEqualTo(password);
